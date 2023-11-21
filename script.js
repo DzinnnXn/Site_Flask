@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const tabela = document.querySelector(".tabela-js");
-  
+
     // Obtenha tarefas da API e preencha a tabela ao carregar a página
     axios.get(`http://127.0.0.1:5000/list`)
         .then(function (resposta) {
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(function (error) {
             console.error(error);
         });
-  
+
     // Função para popular a tabela com tarefas
     function getData(dados) {
         tabela.innerHTML = dados.map(item => `
@@ -23,10 +23,10 @@ document.addEventListener('DOMContentLoaded', function () {
         </span></button></td>
     </tr>`
         ).join('');
-  
+
         todos_Eventos();
-      };
-  
+    };
+
     function todos_Eventos() {
         // Adicione uma nova tarefa
         document.querySelector("#add-tarefa").addEventListener("click", function () {
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert("Digite uma tarefa!");
                 return;
             }
-  
+
             axios.post(`http://127.0.0.1:5000/add`, { Tarefa: tarefa })
                 .then(function () {
                     loadTasks();
@@ -43,13 +43,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 .catch(function (error) {
                     console.error(error);
                 });
-          });
-  
+        });
+
         // Exclua uma tarefa
         document.querySelectorAll(".delete-btn").forEach(btn => {
             btn.addEventListener("click", function (e) {
-                const id = e.target.parentElement.parentElement.firstElementChild.textContent;
-                axios.delete(`http://127.0.0.1:5000/delete/${id}`)
+                const id = e.target.closest("tr").querySelector("th").textContent;
+                axios.delete(`http://127.0.0.1:5000/delete`, { data: { id: parseInt(id) } })
                     .then(function () {
                         loadTasks();
                     })
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
             });
         });
-  
+
         // Defina o ID e a tarefa quando o botão de edição é clicado
         document.querySelector(".tabela-js").addEventListener("click", function (e) {
             const editBtn = e.target.closest(".edit-btn");
@@ -67,16 +67,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 const id = row.querySelector("th").textContent;
                 const tarefa = row.querySelector("td").textContent;
                 document.querySelector("#edit-tarefa").value = tarefa;
+                document.querySelector("#edit-tarefa-btn").dataset.id = id; // Armazena o ID no botão de edição
             }
         });
-  
+
         // Atualize uma tarefa
         document.querySelector("#edit-tarefa-btn").addEventListener("click", function () {
             const tarefaupdate = document.querySelector("#edit-tarefa").value;
-            const id = document.querySelector(".edit-btn").parentElement.parentElement.firstElementChild.textContent;
-            
+            const id = this.dataset.id; // Obtém o ID armazenado no botão de edição
+
             if (id) {
-                axios.put(`http://127.0.0.1:5000/update/${id}`, { Tarefa: tarefaupdate })
+                axios.put(`http://127.0.0.1:5000/update`, { id: parseInt(id), nova_tarefa: tarefaupdate })
                     .then(function () {
                         loadTasks();
                     })
@@ -84,12 +85,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         console.error(error);
                     })
                     .finally(function () {
-                        id = null;
+                        document.querySelector("#edit-tarefa-btn").dataset.id = null; // Limpa o ID armazenado
                     });
             }
         });
-      }
-  
+
+    }
+
     // Função para recarregar as tarefas
     function loadTasks() {
         axios.get(`http://127.0.0.1:5000/list`)
@@ -99,5 +101,5 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(function (error) {
                 console.error(error);
             });
-          }
-      });
+    }
+});
