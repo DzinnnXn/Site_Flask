@@ -1,25 +1,103 @@
-const tabela = document.querySelector(".tabela-js");
-
-axios.get('http://127.0.0.1:5000/list').then((response) => {
-        getData(response.data);
-    })
-
-    .catch(function(error){
-        console.log(error);
-    })
-
-    function getData(data){
-        data.map((item)=>{
-            tabela.innerHTML += ` 
-            <tr>
-                <th scope="row">${item.ID}</th>
-                <td>${item.TAREFA}</td>
-                <td><button class="btn bg-white" type="button" data-bs-toggle="modal" data-bs-target="#modalDel"><span class="material-symbols-outlined text-danger">
-                delete
-                </span></button> <button class="btn bg-white" type="button" data-bs-toggle="modal" data-bs-target="#modalEdit"><span class="material-symbols-outlined text-success">
-                edit
-                </span></button></td>
-            </tr>
-            `
+document.addEventListener('DOMContentLoaded', function () {
+    const tabela = document.querySelector(".tabela-js");
+  
+    // Obtenha tarefas da API e preencha a tabela ao carregar a página
+    axios.get(`http://127.0.0.1:5000/list`)
+        .then(function (resposta) {
+            getData(resposta.data);
         })
-    }
+        .catch(function (error) {
+            console.error(error);
+        });
+  
+    // Função para popular a tabela com tarefas
+    function getData(dados) {
+        tabela.innerHTML = dados.map(item => `
+        <tr>
+        <th scope="row">${item.ID}</th>
+        <td>${item.TAREFA}</td>
+        <td><button class="btn bg-white delete-btn" type="button" data-bs-toggle="modal" data-bs-target="#modalDel"><span class="material-symbols-outlined text-danger">
+        delete
+        </span></button> <button class="btn bg-white edit-btn" id="edit-tarefa-btn"  type="button" data-bs-toggle="modal" data-bs-target="#modalEdit"><span class="material-symbols-outlined text-success">
+        edit
+        </span></button></td>
+    </tr>`
+        ).join('');
+  
+        todos_Eventos();
+      };
+  
+    function todos_Eventos() {
+        // Adicione uma nova tarefa
+        document.querySelector("#add-tarefa").addEventListener("click", function () {
+            const tarefa = document.querySelector("#tarefa").value;
+            if (tarefa === "") {
+                alert("Digite uma tarefa!");
+                return;
+            }
+  
+            axios.post(`http://127.0.0.1:5000/add`, { Tarefa: tarefa })
+                .then(function () {
+                    loadTasks();
+                })
+                .catch(function (error) {
+                    console.error(error);
+                });
+          });
+  
+        // Exclua uma tarefa
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+            btn.addEventListener("click", function (e) {
+                const id = e.target.parentElement.parentElement.firstElementChild.textContent;
+                axios.delete(`http://127.0.0.1:5000/delete/${id}`)
+                    .then(function () {
+                        loadTasks();
+                    })
+                    .catch(function (error) {
+                        console.error(error);
+                    });
+            });
+        });
+  
+        // Defina o ID e a tarefa quando o botão de edição é clicado
+        document.querySelector(".tabela-js").addEventListener("click", function (e) {
+            const editBtn = e.target.closest(".edit-btn");
+            if (editBtn) {
+                const row = editBtn.closest("tr");
+                const id = row.querySelector("th").textContent;
+                const tarefa = row.querySelector("td").textContent;
+                document.querySelector("#edit-tarefa").value = tarefa;
+            }
+        });
+  
+        // Atualize uma tarefa
+        document.querySelector("#edit-tarefa-btn").addEventListener("click", function () {
+            const tarefaupdate = document.querySelector("#edit-tarefa").value;
+            const id = document.querySelector(".edit-btn").parentElement.parentElement.firstElementChild.textContent;
+            
+            if (id) {
+                axios.put(`http://127.0.0.1:5000/update/${id}`, { Tarefa: tarefaupdate })
+                    .then(function () {
+                        loadTasks();
+                    })
+                    .catch(function (error) {
+                        console.error(error);
+                    })
+                    .finally(function () {
+                        id = null;
+                    });
+            }
+        });
+      }
+  
+    // Função para recarregar as tarefas
+    function loadTasks() {
+        axios.get(`http://127.0.0.1:5000/list`)
+            .then(function (resposta) {
+                getData(resposta.data);
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+          }
+      });
