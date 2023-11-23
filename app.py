@@ -10,7 +10,7 @@ CORS(app)
 # Tenta criar o arquivo Text.csv caso ele não exista e escreve o cabeçalho
 try:
     open('Text.csv', 'x')
-    with open("Text.csv", "w") as arquivo:
+    with open("Text.csv", "a", encoding='utf-8') as arquivo:
          arquivo.write("ID,TAREFA\n") 
 except:
     pass
@@ -19,7 +19,8 @@ except:
 @app.route("/list", methods=['GET'])
 def listarTarefas():    
     # Lê o arquivo Text.csv e converte para um dicionário
-    tarefas = pd.read_csv('Text.csv')
+    #encoding='utf-8' serve para a leitura ler os acentos
+    tarefas = pd.read_csv('Text.csv', encoding='utf-8')
     tarefas = tarefas.to_dict('records')    
     # Retorna as tarefas em formato JSON
     return jsonify(tarefas)
@@ -30,15 +31,17 @@ def addTarefas():
     # Obtém a tarefa enviada pelo cliente
     item = request.json  
     # Lê o arquivo Text.csv e converte para um dicionário
-    tarefas = pd.read_csv('Text.csv')
+    #encoding='utf-8' serve para a leitura ler os acentos
+    tarefas = pd.read_csv('Text.csv', encoding='utf-8')
     tarefas = tarefas.to_dict('records') 
     # Define o ID da nova tarefa
     id = len(tarefas) + 1
     # Adiciona a nova tarefa ao arquivo Text.csv
-    with open("Text.csv", "a") as arquivo:
+    with open("Text.csv", "a", encoding='utf-8') as arquivo:
          arquivo.write(f"{id},{item['Tarefa']}\n")    
     # Lê o arquivo Text.csv e converte para um dicionário
-    tarefas = pd.read_csv('Text.csv')
+    #encoding='utf-8' serve para a leitura ler os acentos
+    tarefas = pd.read_csv('Text.csv', encoding='utf-8')
     tarefas = tarefas.to_dict('records')        
     # Retorna as tarefas em formato JSON
     return jsonify(tarefas)
@@ -55,7 +58,8 @@ def deleteTarefa():
         return jsonify({"error": "ID da tarefa não fornecido"}), 400
 
     # Lê o arquivo Text.csv e converte para um DataFrame
-    tarefas = pd.read_csv('Text.csv')
+    #encoding='utf-8' serve para a leitura ler os acentos
+    tarefas = pd.read_csv('Text.csv', encoding='utf-8')
 
     # Verifica se a tarefa com o ID fornecido existe
     if id not in tarefas['ID'].values:
@@ -80,7 +84,8 @@ def updateTarefa(id):
     nova_tarefa = request.json.get('TAREFA')
 
     # Lê o arquivo Text.csv e converte para um DataFrame
-    tarefas = pd.read_csv('Text.csv')
+    #encoding='utf-8' serve para a leitura ler os acentos
+    tarefas = pd.read_csv('Text.csv', encoding='utf-8')
 
     # Verifica se a tarefa com o ID fornecido existe
     if id not in tarefas['ID'].values:
