@@ -1,3 +1,4 @@
+// DOMContentLoaded para garantir que o script seja executado apenas quando o DOM estiver completamente carregado.
 document.addEventListener('DOMContentLoaded', function () {
     const tabela = document.querySelector(".tabela-js");
 
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll(".edit-btn").forEach(btn => {
             btn.addEventListener("click", function (e) {
                 const id = e.target.closest("tr").querySelector("th").textContent;
+                
                 const novaTarefa = prompt("Digite a nova descrição da tarefa:");
 
                 if (novaTarefa !== null) {
