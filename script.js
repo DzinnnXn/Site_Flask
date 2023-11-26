@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const tabela = document.querySelector(".tabela-js");
   
-    axios.get(`https://api.augustin06.repl.co/list`)
+    axios.get(`https://api.andresilvr232.repl.colist`)
       .then(function(resposta) {
         getData(resposta.data);
       })
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
           return; // E PARA A EXECUÇÃO DO CODIGO
         }
   
-        axios.post(`https://api.augustin06.repl.co/add`, { Tarefa: tarefa })
+        axios.post(`https://api.andresilvr232.repl.co/add`, { Tarefa: tarefa })
           .then(function() {
             location.reload()
           })
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
       document.querySelectorAll(".delete-btn").forEach(btn => {
         btn.addEventListener("click", function(e) {
           const id = e.target.closest("tr").querySelector("th").textContent;
-          axios.delete(`https://api.augustin06.repl.co/delete`, { data: { id: parseInt(id) } })
+          axios.delete(`https://api.andresilvr232.repl.co/delete`, { data: { id: parseInt(id) } })
             .then(function() {
               loadTasks();
             })
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   
       function updateTarefa(id, novaTarefa) {
-        axios.put(`https://api.augustin06.repl.co/update/${id}`, { TAREFA: novaTarefa })
+        axios.put(`https://api.andresilvr232.repl.co/update/${id}`, { TAREFA: novaTarefa })
         .then(function() {
             location.reload()
           })
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
     // CARREGAR TAREFAS NA PAGINA
     function loadTasks() {
-      axios.get(`https://api.augustin06.repl.co/list`)
+      axios.get(`https://api.andresilvr232.repl.co/list`)
         .then(function(resposta) {
           getData(resposta.data);
         })
